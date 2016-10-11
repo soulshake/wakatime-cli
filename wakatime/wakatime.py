@@ -48,14 +48,10 @@ class RestAPI:
         except requests.exceptions.ConnectionError, m:
             click.secho("NOK (requests.exceptions.ConnectionError): {}"
                         .format(m), fg='red')
-        #except:
-            #click.secho("NOK, unknown", fg='red')
 
         infos = [url, req.status_code, req.reason, error]
         msg = "Errors:\n" + "\n - ".join([str(x) for x in infos if x])
         raise RequestError(msg)
-        #raise RequestError("{} // {}/{}/{}"
-                           #.format(url, req.status_code, req.reason))
 
     def post(self, data, params, **kwargs):
         """ send a POST request """
@@ -114,6 +110,9 @@ class WakatimeAPI(RestAPI):
 class RequestError(Exception):
     pass
 
+class Wakatime(object):
+    def __init__(self):
+        self.api = WakatimeAPI('https://wakatime.com/api/v1/')
 
 @click.group(context_settings=CONTEXT_SETTINGS)
 def cli():
@@ -134,19 +133,15 @@ def summaries(start, end):
 
     #ret = WAKATIME.get("users/current/summaries", start=start, end=end)
     """
-    ret = WAKATIME.get("users/current/stats/last_7_days")
+    ret = Wakatime().api.get("users/current/stats/last_7_days")
     pprint(ret)
 
 @cli.command()
 def whoami():
-    ret = WAKATIME.get("users/current")
+    ret = Wakatime().api.get("users/current")
     data = ret['data']
     pprint(data)
 
 
-WAKATIME = WakatimeAPI('https://wakatime.com/api/v1/')
-
-
 if __name__ == '__main__':
-
     cli(obj={})
