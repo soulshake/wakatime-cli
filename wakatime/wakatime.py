@@ -31,23 +31,23 @@ class RestAPI:
         url = "{}".format(self.url + params)
         if kwargs:
             url += "?{}".format(urllib.urlencode(kwargs))
-        click.secho("getting: {}... "
-                    .format(url), fg='blue', nl=False)
+        #click.secho("getting: {}... "
+                    #.format(url), fg='blue', nl=False)
 
         error = None
 
         try:
             req = requests.get(self.url + params, headers=self.headers)
             if req.ok:
-                click.secho("OK", fg='green')
+                #click.secho("OK", fg='green')
                 return json.loads(req.content)
             else:
-                click.secho("NOK: {}".format(req.reason), fg='red')
+                #click.secho("NOK: {}".format(req.reason), fg='red')
                 ret = json.loads(req.content)
                 error = ret.get('error') or str(ret)
         except requests.exceptions.ConnectionError, m:
-            click.secho("NOK (requests.exceptions.ConnectionError): {}"
-                        .format(m), fg='red')
+            #click.secho("NOK (requests.exceptions.ConnectionError): {}"
+                        #.format(m), fg='red')
 
         infos = [url, req.status_code, req.reason, error]
         msg = "Errors:\n" + "\n - ".join([str(x) for x in infos if x])
@@ -56,25 +56,20 @@ class RestAPI:
     def post(self, data, params, **kwargs):
         """ send a POST request """
         url = "{}".format(self.url + params)
-        click.secho("posting: {} ".format(url), fg='blue', nl=False)
+        #click.secho("posting: {} ".format(url), fg='blue', nl=False)
 
-        try:
-            req = requests.request('post',
-                                   url,
-                                   json=data,
-                                   headers=self.headers,
-                                   **kwargs
-                                   )
+        req = requests.request('post',
+                               url,
+                               json=data,
+                               headers=self.headers,
+                               **kwargs
+                               )
 
-            if req.ok:
-                click.secho("OK", fg='green')
-                return json.loads(req.content)
-            else:
-                click.secho("NOK: {}".format(req.reason), fg='red')
-                return json.loads(req.content)
+        if req.ok:
+            return json.loads(req.content)
+        else:
+            return json.loads(req.content)
 
-        except requests.exceptions.ConnectionError, m:
-            click.secho("NOK: {}".format(m), fg='red')
 
         raise RequestError("{} // {}/{}"
                            .format(url, req.status_code, req.reason))
@@ -103,7 +98,7 @@ class WakatimeAPI(RestAPI):
             msg += click.style(dashboard_url, fg='blue') + "\n"
             msg += ("Once you have it, add it to your bash profile: \n"
                     "export WAKATIME_API_KEY='changeme'")
-            click.secho(msg)
+            click.secho(msg, err=True)
             exit()
 
 
