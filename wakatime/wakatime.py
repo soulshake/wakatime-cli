@@ -31,23 +31,15 @@ class RestAPI:
         url = "{}".format(self.url + params)
         if kwargs:
             url += "?{}".format(urllib.urlencode(kwargs))
-        #click.secho("getting: {}... "
-                    #.format(url), fg='blue', nl=False)
 
         error = None
 
-        try:
-            req = requests.get(self.url + params, headers=self.headers)
-            if req.ok:
-                #click.secho("OK", fg='green')
-                return json.loads(req.content)
-            else:
-                #click.secho("NOK: {}".format(req.reason), fg='red')
-                ret = json.loads(req.content)
-                error = ret.get('error') or str(ret)
-        except requests.exceptions.ConnectionError, m:
-            #click.secho("NOK (requests.exceptions.ConnectionError): {}"
-                        #.format(m), fg='red')
+        req = requests.get(self.url + params, headers=self.headers)
+        if req.ok:
+            return json.loads(req.content)
+        else:
+            ret = json.loads(req.content)
+            error = ret.get('error') or str(ret)
 
         infos = [url, req.status_code, req.reason, error]
         msg = "Errors:\n" + "\n - ".join([str(x) for x in infos if x])
